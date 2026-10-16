@@ -6,8 +6,9 @@ import { getSeasons, getGames, clearCache } from '../lib/data.js';
 import { sendEmail } from '../lib/email.js';
 import { fmtDate, fmtTime } from '../lib/format.js';
 import { query } from '../lib/router.js';
+import { THEMES, currentLiveTheme, previewTheme, setPreview, saveTheme } from '../lib/theme.js';
 
-const TABS = [['registrations', 'Registrations'], ['messages', 'Messages'], ['scores', 'Scores'], ['email', 'Email'], ['news', 'Post news']];
+const TABS = [['registrations', 'Registrations'], ['messages', 'Messages'], ['scores', 'Scores'], ['email', 'Email'], ['news', 'Post news'], ['theme', 'Theme']];
 
 export default async function admin({ tab = 'registrations' }) {
   if (!auth().session) { location.hash = '#/account'; return ''; }
@@ -15,7 +16,7 @@ export default async function admin({ tab = 'registrations' }) {
 
   const seasons = await getSeasons();
   const seasonId = query().get('season') || seasons.find((s) => s.is_current)?.id;
-  const view = await ({ registrations, messages, scores, email, news }[tab] || registrations)(seasons, seasonId);
+  const view = await ({ registrations, messages, scores, email, news, theme }[tab] || registrations)(seasons, seasonId);
 
   return {
     html: html`
@@ -169,6 +170,52 @@ async function news() {
         toast('Published');
         location.hash = `#/news/${slug}`;
       });
+    },
+  };
+}
+
+async function theme() {
+  const live = currentLiveTheme();
+  const previewing = previewTheme();
+  return {
+    html: html`
+      <p class="lede">Pick the look for the whole site. <strong>Preview</strong> changes only your screen; <strong>Make live</strong> switches it for every visitor.</p>
+      <div class="theme-grid">${THEMES.map((t) => html`
+        <article class="theme-card ${t.id === live ? 'is-live' : ''}">
+          <div class="theme-mock" style="background:${t.headerBg};color:${t.headerFg}">
+            <span class="mock-title" style="font-family:${t.font}">${t.name}</span>
+            <span class="theme-swatches">${t.swatches.map((c) => html`<span style="background:${c}"></span>`)}</span>
+          </div>
+          <div class="theme-body">
+            <p>${t.tagline}</p>
+            ${t.id === live ? html`<span class="pill pill-accent">Live now</span>` : ''}
+            ${t.id === previewing ? html`<span class="pill">Previewing</span>` : ''}
+            <div class="theme-actions">
+              <button class="btn btn-outline btn-sm" data-preview="${t.id}">Preview</button>
+              ${t.id !== live ? html`<button class="btn btn-accent btn-sm" data-live="${t.id}">Make live</button>` : ''}
+            </div>
+          </div>
+        </article>`)}
+      </div>`,
+    mount(root) {
+      THEMES.forEach((t) => window.NSS_loadThemeFonts?.(t.id)); // so each card shows its real font
+      root.querySelectorAll('[data-preview]').forEach((b) => b.addEventListener('click', () => {
+        setPreview(b.dataset.preview);
+        location.hash = '#/';
+      }));
+      root.querySelectorAll('[data-live]').forEach((b) => b.addEventListener('click', async () => {
+        const t = THEMES.find((x) => x.id === b.dataset.live);
+        if (!confirm(`Switch the whole site to the “${t.name}” theme for everyone?`)) return;
+        b.disabled = true;
+        try {
+          await saveTheme(t.id, auth().session.user.id);
+          toast(`“${t.name}” is now live`);
+          location.hash = '#/';
+        } catch (err) {
+          toast(err.message, 'error');
+          b.disabled = false;
+        }
+      }));
     },
   };
 }

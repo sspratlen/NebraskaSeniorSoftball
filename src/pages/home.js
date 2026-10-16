@@ -29,9 +29,29 @@ export default async function home() {
           </ul>
         </div>
         <div class="hero-card" aria-hidden="true">
-          <div class="diamond">
+          <div class="art art-ballpark diamond">
             <span class="base b1"></span><span class="base b2"></span><span class="base b3"></span><span class="base home"></span>
             <span class="mound"></span>
+          </div>
+          <div class="art art-scoreboard">
+            <div class="lineup-head"><span>NSS</span><span class="led-green">● LIVE</span></div>
+            <table class="linescore">
+              <tr><th></th>${[1, 2, 3, 4, 5, 6, 7].map((n) => html`<th>${n}</th>`)}<th>R</th></tr>
+              <tr><td>FUN</td><td>2</td><td>0</td><td>3</td><td>1</td><td>0</td><td>4</td><td>1</td><td class="runs">11</td></tr>
+              <tr><td>FIT</td><td>1</td><td>2</td><td>0</td><td>2</td><td>3</td><td>0</td><td>2</td><td class="runs">10</td></tr>
+            </table>
+            <div class="count"><span>BALL <b>●●○</b></span><span>STRIKE <b>●○</b></span><span>OUT <b>●●</b></span></div>
+          </div>
+          <div class="art art-varsity">
+            <div class="patch"><span>N</span></div>
+            <div class="patch-sub">Senior Softball · Est. Omaha</div>
+          </div>
+          <div class="art art-cards">
+            <div class="tcard">
+              <div class="tcard-photo"><span class="tcard-ball"></span></div>
+              <div class="tcard-band"><strong>NSS ALL-STAR</strong><span>Utility · 50+</span></div>
+              <div class="tcard-pennant">NEBRASKA</div>
+            </div>
           </div>
         </div>
       </div>

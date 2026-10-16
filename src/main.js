@@ -1,6 +1,8 @@
 import './styles.css';
+import './themes.css';
 import { route, start, onRoute, currentPath } from './lib/router.js';
 import { initAuth, onAuth } from './lib/auth.js';
+import { initTheme, renderPreviewBar } from './lib/theme.js';
 import { SPRITE, errorBox, empty } from './lib/ui.js';
 import { html } from './lib/html.js';
 import { renderHeader, renderFooter } from './layout.js';
@@ -68,7 +70,10 @@ const authReturn = /(^#|&)(access_token|error_description)=/.test(location.hash)
 
 (async () => {
   renderFooter();
+  const themeReady = initTheme().catch((err) => console.warn('Theme not loaded:', err));
   await initAuth();
+  await themeReady;
+  renderPreviewBar();
   if (authReturn) {
     let next = '/account';
     try { next = sessionStorage.getItem('nss-after-login') || next; sessionStorage.removeItem('nss-after-login'); } catch (_) {}

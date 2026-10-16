@@ -82,6 +82,7 @@ its pages. Items below need board confirmation or files from the old WordPress i
 | P-11 | Accessibility audit (WCAG 2.2 AA), font-size toggle for older eyes | P1 | ⬜ |
 | P-12 | PWA: installable app icon + offline schedule | P3 | ⬜ |
 | P-13 | Field map / directions page with field numbers at LaVista Sports Complex | P3 | ⬜ |
+| P-14 | Admin-selectable site themes: Scoreboard, Ballpark, Varsity, Trading Card (preview + make live) | P1 | ✅ |
 
 ## Epic 4 — Registration & payments
 

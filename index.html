@@ -8,7 +8,32 @@
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet" />
+    <script>
+      // Paint in the last-known site theme before the app loads (no flash), and
+      // load only that theme's fonts. src/lib/theme.js confirms it from Supabase.
+      (function () {
+        var FONTS = {
+          scoreboard: 'Orbitron:wght@500;700;900&family=VT323&family=Barlow:wght@400;500;600;700',
+          ballpark: 'Alfa+Slab+One&family=Source+Sans+3:wght@400;600;700',
+          varsity: 'Graduate&family=Libre+Franklin:wght@400;500;600;700',
+          cards: 'Righteous&family=Nunito:wght@400;600;700;800&family=Courier+Prime:wght@400;700'
+        };
+        var loaded = {};
+        window.NSS_loadThemeFonts = function (id) {
+          if (!FONTS[id] || loaded[id]) return;
+          loaded[id] = true;
+          var l = document.createElement('link');
+          l.rel = 'stylesheet';
+          l.href = 'https://fonts.googleapis.com/css2?family=' + FONTS[id] + '&display=swap';
+          document.head.appendChild(l);
+        };
+        var t;
+        try { t = sessionStorage.getItem('nss-theme-preview') || localStorage.getItem('nss-theme'); } catch (e) {}
+        if (!FONTS[t]) t = 'ballpark';
+        document.documentElement.setAttribute('data-site-theme', t);
+        window.NSS_loadThemeFonts(t);
+      })();
+    </script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
