@@ -43,11 +43,18 @@ Tables: `leagues`, `seasons`, `teams`, `games`, `fields`, `players`, `roster`, `
 - Player contact info is never public; `team_roster(team_id)` exposes names only.
 - Admins (`profiles.role = 'admin'`) can do everything via the in-site Admin dashboard.
 
-**Make someone an admin:** have them sign in once (My Account → email link), then run in the Supabase SQL editor:
+**Make someone an admin:** add their email to `admin_invites` (Supabase SQL editor) and they become an admin
+the first time they sign in:
+
+```sql
+insert into public.admin_invites (email, note) values ('person@example.com', 'Director of Scheduling');
+```
+
+If they have already signed in, promote the existing account instead:
 
 ```sql
 update public.profiles set role = 'admin'
-where id = (select id from auth.users where email = 'person@example.com');
+where id = (select id from auth.users where lower(email) = lower('person@example.com'));
 ```
 
 ## Email (Resend)
