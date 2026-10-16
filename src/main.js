@@ -62,9 +62,18 @@ onRoute(async (handler, params, path) => {
   }
 });
 
+// A magic-link return lands as #access_token=… (or #error=…). Let Supabase read it,
+// then swap it for a real route so the hash router never sees the tokens.
+const authReturn = /(^#|&)(access_token|error_description)=/.test(location.hash);
+
 (async () => {
   renderFooter();
   await initAuth();
+  if (authReturn) {
+    let next = '/account';
+    try { next = sessionStorage.getItem('nss-after-login') || next; sessionStorage.removeItem('nss-after-login'); } catch (_) {}
+    history.replaceState(null, '', `${location.pathname}${location.search}#${next}`);
+  }
   onAuth(() => renderHeader(currentPath()));
   start();
 })();

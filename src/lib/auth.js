@@ -24,7 +24,10 @@ export const isAdmin = () => state.profile?.role === 'admin';
 export const onAuth = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
 
 export async function sendMagicLink(email) {
-  const redirectTo = `${location.origin}${location.pathname}#/account`;
+  // No hash in the redirect: Supabase appends the session tokens as #access_token=…,
+  // which would collide with our hash routes. main.js routes to #/account afterwards.
+  const redirectTo = `${location.origin}${location.pathname}`;
+  try { sessionStorage.setItem('nss-after-login', '/account'); } catch (_) {}
   return supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo } });
 }
 
